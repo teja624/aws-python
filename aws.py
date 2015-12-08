@@ -21,6 +21,9 @@ def blankSpace(lines):
         print((lines - 1) * blank)
 
 #menu generator
+# title = Menu title
+# spacing = NO. of lines between options
+# *args = name of list that contains the options
 def menu(title,spacing,*args):
     blank = "\n"
     x = 0
@@ -56,7 +59,7 @@ def asciiArt():
 
 #menu declerations
 mainMenu = ['AWS Functions','Setup','Exit']
-awsMenu = ['S3','Other','Exit']
+awsMenu = ['S3','Other','Exit`']
 
 
 
