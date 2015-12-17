@@ -4,6 +4,6 @@ This project is still under heavy development.
 A python "browser" for AWS services
 
 --INSTALLATION--
-Open a new terminal session and do:
+The project will install any packages that it requires if they cannot be found.
 
-pip3 install boto3
+This project in its entirety is being developed in Atom.
