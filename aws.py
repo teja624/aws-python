@@ -83,11 +83,13 @@ time.sleep(3)
 while True:
     menu.clearScreen()
     print("For first time users select 'Setup'")
+    if debug:
+        print("Debug is enabled")
     menu.blankSpace(1)
     main = menu.generate('Main Menu', 0, 0, *mainMenu)
-    if main == 1:
+    if main == 1: #AWS Functions
         submain1 = menu.generate('AWS Functions', 1, 1, *awsMenu)
-        if submain1 == 1:
+        if submain1 == 1: #S3 Functions
             menu.clearScreen()
             s3 = boto3.resource('s3')
             s3main = menu.generate('S3 Functions', 1, 1, *s3Menu)
@@ -109,17 +111,20 @@ while True:
                     menu.blankSpace(1)
                     try:
                         print("Initialising New Bucket as " + bucketName + "...")
-                        s3.create_bucket(Bucket='mybucket')
+                        s3.create_bucket(Bucket=bucketName)
                         print("New Bucket "  + bucketName + " Initialised")
-                    except Exception:
+                    except Exception as e:
                         menu.clearScreen()
-                        print("An error has occured, it is likely a bucket already exists with this name...")
-                    time.sleep(2)
+                        print(e)
+                        print("Please Wait...")
+                        if debug:
+                            input()
+                    time.sleep(5)
                 elif bucketmain == 3:
                     menu.clearScreen()
                     print("Delete Bucket")
                     bucketName = input("Name of Bucket: ")
-                    if input("Are you sure you want to delete bucket" + bucketName +"? [Y/N]") == 'Y' or 'y':
+                    if input("Are you sure you want to delete bucket" + bucketName +"? [Y/N] ") == 'Y' or 'y':
                         bucket = s3.Bucket(bucketName)
                         print("Deleting keys in " + bucketName)
                         for key in bucket.objects.all():
@@ -136,7 +141,7 @@ while True:
                     bucket = s3.Bucket(bucketName)
                     exists = True
                     try:
-                        s3.meta.client.head_bucket(Bucket='mybucket')
+                        s3.meta.client.head_bucket(Bucket=bucketName)
                         print("Bucket is up and functional")
                     except botocore.exceptions.ClientError as e:
                         error_code = int(e.response['Error']['Code'])
@@ -160,7 +165,7 @@ while True:
         print("Initial setup is complete")
         menu.time.sleep(2)
     elif main == 3:
-        exit()
+        break
     else:
         menu.clearScreen()
         print("Please enter a valid option")

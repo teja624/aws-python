@@ -23,15 +23,13 @@ class menu:
         lines = 1
 
     def generate(title, spacing, clear, *args):
-        if clear == 1:
-            menu.clearScreen()
+        if clear == 1: menu.clearScreen()
         x = 0
         print(title + ":")
         for a in args:
             x = x + 1
             print(a + "[" + str(x) + "]" + (spacing * "\n"))
-        option = input("Option: ")
-        return int(option)
+        return int(input("Option: "))
 
     def clearScreen():
         os.system('cls' if os.name == 'nt' else 'clear')
