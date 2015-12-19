@@ -72,9 +72,9 @@ def asciiArt():
 # menu declerations (it does support more than 3 listable items)
 mainMenu = ['AWS Functions', 'Setup', 'Exit']
 awsMenu = ['S3', 'Other', 'Exit']
-s3Menu = ['Upload or Download Files', 'Modify or View Buckets']
+s3Menu = ['Modify or View Files', 'Modify or View Buckets']
 bucketsMenu = ['List All Buckets', 'Initialise a New Bucket', 'Delete Bucket','Check the Status of a Bucket']
-s3sub = ['Upload File','Download File']
+s3sub = ['View Files','Upload File','Download File', 'Delete File']
 
 
 # Thanks to Active State user Barry Walker for assistance with window sizing
@@ -100,17 +100,70 @@ while True:
                 s3sub = menu.generate('Upload or Download Files', 1, 1, *s3sub)
                 if s3sub == 1:
                     menu.clearScreen()
-                    bucketName = input("Bucket to Upload to: ")
+                    print("View Files\n")
+                    for bucket in s3.buckets.all():
+                        print(bucket.name + ":")
+                        for key in bucket.objects.all():
+                            print(key.key)
+                    input("Press enter to continue...")
+                if s3sub == 2:
+                    menu.clearScreen()
+                    print("Upload File")
+                    print("\nAvailable Buckets:")
+                    for bucket in s3.buckets.all():
+                        print(bucket.name)
+                    bucketName = input("\nBucket to Upload to: ")
                     file = open(input("Full Address of File: "), 'rb')
                     try:
                         s3.Object(bucketName, os.path.basename(file.name)).put(Body=file)
-                        print("Successfully uploaded file " + os.path.basename(file.name) + " to " + bucketName)
+                        print("Successfully Uploaded File " + os.path.basename(file.name) + " to " + bucketName)
                         file.close()
                     except Exception as e:
                         menu.clearScreen()
                         print(e)
                         print("An error has occured, please try again later...")
                         if debug: input()
+                    time.sleep(2)
+                if s3sub == 3:
+                    menu.clearScreen()
+                    print("Download File")
+                    print("\nAvailable Buckets and Files:")
+                    for bucket in s3.buckets.all():
+                        print(bucket.name + ":")
+                        for key in bucket.objects.all():
+                            print(key.key)
+                    bucketName = input("\nBucket to Download From: ")
+                    file = input("Full Address of File: ")
+                    try:
+                        s3.Bucket(bucketName).download_file(file, '/downloads/' + file)
+                        print("Successfully Downloaded File " + file)
+                    except Exception as e:
+                        menu.clearScreen()
+                        print(e)
+                        print("An error has occured, please try again later...")
+                        if debug: input()
+                    time.sleep(2)
+                if s3sub == 4:
+                    menu.clearScreen()
+                    print("Delete File")
+                    print("\nAvailable Buckets and Files:")
+                    for bucket in s3.buckets.all():
+                        print(bucket.name + ":")
+                        for key in bucket.objects.all():
+                            print(key.key)
+                    bucketName = input("\nBucket to Delete From: ")
+                    file = input("Full Address of File: ")
+                    if input("Are you sure you want to delete file " + file +"? [Y/N]: ") == 'Y' or 'y':
+                        try:
+                            s3.Object(bucketName,file).delete()
+                            print("Successfully Deleted File " + file)
+                        except Exception as e:
+                            menu.clearScreen()
+                            print(e)
+                            print("An error has occured, please try again later...")
+                            if debug: input()
+                    else:
+                        print("File " + file +" has not been deleted.")
                     time.sleep(2)
             elif s3main == 2:
                 bucketmain = menu.generate('Bucket Functions', 1, 1, *bucketsMenu)
@@ -139,8 +192,11 @@ while True:
                 elif bucketmain == 3:
                     menu.clearScreen()
                     print("Delete Bucket")
+                    print("\nAvailable Buckets:")
+                    for bucket in s3.buckets.all():
+                        print(bucket.name)
                     bucketName = input("Name of Bucket: ")
-                    if input("Are you sure you want to delete bucket" + bucketName +"? [Y/N]: ") == 'Y' or 'y':
+                    if input("Are you sure you want to delete bucket " + bucketName +"? [Y/N]: ") == 'Y' or 'y':
                         bucket = s3.Bucket(bucketName)
                         print("Deleting keys in " + bucketName)
                         for key in bucket.objects.all():
@@ -153,7 +209,11 @@ while True:
                     input("Press Enter to continue...")
                 elif bucketmain == 4:
                     menu.clearScreen()
-                    bucketName = input("Check Status of Bucket: ")
+                    print("Check Bucket")
+                    print("\nAvailable Buckets:")
+                    for bucket in s3.buckets.all():
+                        print(bucket.name)
+                    bucketName = input("Bucket: ")
                     bucket = s3.Bucket(bucketName)
                     exists = True
                     try:
