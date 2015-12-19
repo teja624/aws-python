@@ -23,7 +23,7 @@ if boto3Status:
 else:
     if os.name == 'nt':
         print("windows interface")
-        os.system(commands + ' --install-option="--prefix=$HOME/local" ' + packages[0])
+        os.system(commands + " " + packages[0])
         #pip install --install-option="--prefix=$HOME/local" boto3
         time.sleep(1)
     else:
@@ -34,7 +34,7 @@ if awscliStatus:
 else:
     if os.name == 'nt':
         print("windows interface")
-        os.system(commands + ' --install-option="--prefix=$HOME/local" ' + packages[1])
+        os.system(commands + " " + packages[1])
         #pip install --install-option="--prefix=$HOME/local" boto3
         time.sleep(1)
     else:
