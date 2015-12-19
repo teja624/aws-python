@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, time, subprocess, menugenerator as menu
 # TODO: Turn follow mess into lib
+#Start up lib checks
 debug = 0
 boto3Status = 0
 awscliStatus = 0
@@ -50,6 +51,13 @@ import botocore
 menu = menu.menu
 size = sys.stdout
 
+# menu declerations (it does support more than 3 listable items)
+mainMenu = ['AWS Functions', 'Setup', 'Exit']
+awsMenu = ['S3', 'Other', 'Exit']
+s3Menu = ['Modify or View Files', 'Modify or View Buckets']
+bucketsMenu = ['List All Buckets', 'Initialise a New Bucket', 'Delete Bucket','Check the Status of a Bucket']
+s3sub = ['View Files','Upload File','Download File', 'Delete File']
+
 # intro "animation" and ASCII art
 def asciiArt():
     print("Welcome to...")
@@ -65,14 +73,6 @@ def asciiArt():
     print("                                  |___/                   V0.2")
     menu.blankSpace(1)
     print("Written by Tom Hulbert")
-
-# menu declerations (it does support more than 3 listable items)
-mainMenu = ['AWS Functions', 'Setup', 'Exit']
-awsMenu = ['S3', 'Other', 'Exit']
-s3Menu = ['Modify or View Files', 'Modify or View Buckets']
-bucketsMenu = ['List All Buckets', 'Initialise a New Bucket', 'Delete Bucket','Check the Status of a Bucket']
-s3sub = ['View Files','Upload File','Download File', 'Delete File']
-
 
 # Thanks to Active State user Barry Walker for assistance with window sizing
 size.write("\x1b[8;{rows};{cols}t".format(rows=28, cols=150))
@@ -145,7 +145,7 @@ while True:
                     print("Delete File")
                     print("\nAvailable Buckets and Files:")
                     for bucket in s3.buckets.all():
-                        printprint("\n"+bucket.name + ":")
+                        print("\n"+bucket.name + ":")
                         for key in bucket.objects.all():
                             print(key.key)
                     bucketName = input("\nBucket to Delete From: ")
