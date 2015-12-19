@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys, os, time, subprocess, menugenerator as menu
 # TODO: Turn follow mess into lib
-debug = 1
+debug = 0
 boto3Status = 0
 awscliStatus = 0
 commands = 'pip3 install'
@@ -19,7 +19,8 @@ except ImportError:
     awscliStatus = 0
 
 if boto3Status:
-    print("found lib " + packages[0])
+    if debug:
+        print("found lib " + packages[0])
 else:
     if os.name == 'nt':
         print("windows interface")
@@ -30,7 +31,8 @@ else:
         os.system("sudo" + commands + packages[0])
 
 if awscliStatus:
-    print("found lib " + packages[1])
+    if debug:
+        print("found lib " + packages[1])
 else:
     if os.name == 'nt':
         print("windows interface")
@@ -102,7 +104,8 @@ while True:
                     file = open(input("Full Address of File: "), 'rb')
                     try:
                         s3.Object(bucketName, os.path.basename(file.name)).put(Body=file)
-                        print("Successfully uploaded file " + os.path.basename(file.name) + "to " + bucketName)
+                        print("Successfully uploaded file " + os.path.basename(file.name) + " to " + bucketName)
+                        file.close()
                     except Exception as e:
                         menu.clearScreen()
                         print(e)
@@ -137,7 +140,7 @@ while True:
                     menu.clearScreen()
                     print("Delete Bucket")
                     bucketName = input("Name of Bucket: ")
-                    if input("Are you sure you want to delete bucket" + bucketName +"? [Y/N] ") == 'Y' or 'y':
+                    if input("Are you sure you want to delete bucket" + bucketName +"? [Y/N]: ") == 'Y' or 'y':
                         bucket = s3.Bucket(bucketName)
                         print("Deleting keys in " + bucketName)
                         for key in bucket.objects.all():

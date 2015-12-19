@@ -1,10 +1,14 @@
 # aws-python
-A python "browser" for AWS services
+## A python "browser" for AWS services
 
-This project is still under heavy development.
+** This project is still under heavy development. **
 
---INSTALLATION--
+## --INSTALLATION--
 * The project will install any packages that it requires if they cannot be found.
 * Windows users may have to open the program with admin permissions initially to the complete install
+
+
+## Upon prior to initial opening Windows user will have to run the follow command in CMD:
+
 
 This project in its entirety is being developed in Atom.
