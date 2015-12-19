@@ -28,7 +28,7 @@ else:
         time.sleep(1)
     else:
         os.system("sudo" + commands + packages[0])
-    import boto3
+
 if awscliStatus:
     print("found lib " + packages[1])
 else:
@@ -41,6 +41,9 @@ else:
         os.system("sudo" + commands + packages[1])
 if debug:
     time.sleep(1)
+
+import boto3
+import botocore
 
 menu = menu.menu
 size = sys.stdout
@@ -68,7 +71,7 @@ def asciiArt():
 mainMenu = ['AWS Functions', 'Setup', 'Exit']
 awsMenu = ['S3', 'Other', 'Exit']
 s3Menu = ['Upload or Download Files', 'Modify or View Buckets']
-bucketsMenu = ['List All Buckets', 'Initialise a New Bucket', 'Delete Bucket']
+bucketsMenu = ['List All Buckets', 'Initialise a New Bucket', 'Delete Bucket','Check the Status of a Bucket']
 
 
 # Thanks to Active State user Barry Walker for assistance with window sizing
@@ -106,16 +109,42 @@ while True:
                     menu.blankSpace(1)
                     try:
                         print("Initialising New Bucket as " + bucketName + "...")
-                        s3.create_bucket(Bucket=bucketName)
-                        print("New Bucket Initialised")
+                        s3.create_bucket(Bucket='mybucket')
+                        print("New Bucket "  + bucketName + " Initialised")
                     except Exception:
+                        menu.clearScreen()
                         print("An error has occured, it is likely a bucket already exists with this name...")
                     time.sleep(2)
-                elif bucketmain == 2:
+                elif bucketmain == 3:
                     menu.clearScreen()
                     print("Delete Bucket")
+                    bucketName = input("Name of Bucket: ")
+                    if input("Are you sure you want to delete bucket" + bucketName +"? [Y/N]") == 'Y' or 'y':
+                        bucket = s3.Bucket(bucketName)
+                        print("Deleting keys in " + bucketName)
+                        for key in bucket.objects.all():
+                            key.delete()
+                        bucket.delete()
+                        print("Bucket " + bucketName +" has been deleted.")
+                    else:
+                        print("Bucket " + bucketName +" has not been deleted.")
+                    time.sleep(1)
                     input("Press Enter to continue...")
-            time.sleep(1)
+                elif bucketmain == 4:
+                    menu.clearScreen()
+                    bucketName = input("Check Status of Bucket: ")
+                    bucket = s3.Bucket(bucketName)
+                    exists = True
+                    try:
+                        s3.meta.client.head_bucket(Bucket='mybucket')
+                        print("Bucket is up and functional")
+                    except botocore.exceptions.ClientError as e:
+                        error_code = int(e.response['Error']['Code'])
+                        if error_code == 404:
+                            exists = False
+                            print("The bucket you requested does not exist or you do not have access to it.")
+                    print(exists)
+                    time.sleep(2)
         if submain1 == 2:
             menu.clearScreen()
             print(awsMenu[1])
