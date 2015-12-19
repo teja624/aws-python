@@ -3,12 +3,13 @@
 
 ** This project is still under heavy development. **
 
-## --INSTALLATION--
+### --INSTALLATION--
 * The project will install any packages that it requires if they cannot be found.
 * Windows users may have to open the program with admin permissions initially to the complete install
 
 
-## Upon prior to initial opening Windows user will have to run the follow command in CMD:
-
+### **Windows Users See Below**
+As of V0.1 Windows users will have to run the following commands after initially opening the program: 
+* aws configure
 
 This project in its entirety is being developed in Atom.
