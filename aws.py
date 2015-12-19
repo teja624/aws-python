@@ -72,6 +72,7 @@ mainMenu = ['AWS Functions', 'Setup', 'Exit']
 awsMenu = ['S3', 'Other', 'Exit']
 s3Menu = ['Upload or Download Files', 'Modify or View Buckets']
 bucketsMenu = ['List All Buckets', 'Initialise a New Bucket', 'Delete Bucket','Check the Status of a Bucket']
+s3sub = ['Upload File','Download File']
 
 
 # Thanks to Active State user Barry Walker for assistance with window sizing
@@ -94,8 +95,20 @@ while True:
             s3 = boto3.resource('s3')
             s3main = menu.generate('S3 Functions', 1, 1, *s3Menu)
             if s3main == 1:
-                menu.clearScreen()
-                time.sleep(1)
+                s3sub = menu.generate('Upload or Download Files', 1, 1, *s3sub)
+                if s3sub == 1:
+                    menu.clearScreen()
+                    bucketName = input("Bucket to Upload to: ")
+                    file = open(input("Full Address of File: "), 'rb')
+                    try:
+                        s3.Object(bucketName, os.path.basename(file.name)).put(Body=file)
+                        print("Successfully uploaded file " + os.path.basename(file.name) + "to " + bucketName)
+                    except Exception as e:
+                        menu.clearScreen()
+                        print(e)
+                        print("An error has occured, please try again later...")
+                        if debug: input()
+                    time.sleep(2)
             elif s3main == 2:
                 bucketmain = menu.generate('Bucket Functions', 1, 1, *bucketsMenu)
                 if bucketmain == 1:
