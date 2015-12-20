@@ -31,9 +31,7 @@ class menu:
             print(a + "[" + str(x) + "]" + (spacing * "\n"))
         return int(input("Option: "))
 
-    def clearScreen():
-        os.system('cls' if os.name == 'nt' else 'clear')
+    def clearScreen():os.system('cls' if os.name == 'nt' else 'clear')
 
-    def blankSpace(lines):
-        print("") if lines <= 1 else print((lines - 1) * "\n")
+    def blankSpace(lines):print("") if lines <= 1 else print((lines - 1) * "\n")
 # End lazy
