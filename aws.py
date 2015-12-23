@@ -59,13 +59,11 @@ size = sys.stdout
 mainMenu = ['AWS Functions', 'Setup', 'Exit']
 awsMenu = ['S3', 'Other', 'Exit']
 s3Menu = ['Modify or View Files', 'Modify or View Buckets']
-bucketsMenu = ['List All Buckets', 'Initialise a New Bucket',
-               'Delete Bucket', 'Check the Status of a Bucket']
-s3sub = ['View Files', 'Upload File', 'Download File', 'Delete File']
+bucketsMenu = ['List All Buckets', 'Initialise a New Bucket','Delete Bucket', 'Check the Status of a Bucket']
+s3sub = ['View Files', 'Upload Files', 'Download File', 'Delete File']
+uploadMenu = ['Single File Upload', 'Multi-File Upload']
 
 # intro "animation" and ASCII art
-
-
 def asciiArt():
     print("Welcome to...")
     time.sleep(1)
@@ -101,8 +99,8 @@ while True:
             s3 = boto3.resource('s3')
             s3main = menu.generate('S3 Functions', 1, 1, *s3Menu)
             if s3main == 1:
-                s3sub = menu.generate('Upload or Download Files', 1, 1, *s3sub)
-                if s3sub == 1:
+                s3Sub = menu.generate('Upload or Download Files', 1, 1, *s3sub)
+                if s3Sub == 1:
                     menu.clearScreen()
                     print("View Files\n")
                     for bucket in s3.buckets.all():
@@ -110,28 +108,52 @@ while True:
                         for key in bucket.objects.all():
                             print(key.key)
                     input("Press enter to continue...")
-                if s3sub == 2:
-                    menu.clearScreen()
-                    print("Upload File")
-                    print("\nAvailable Buckets:")
-                    for bucket in s3.buckets.all():
-                        print(bucket.name)
-                    bucketName = input("\nBucket to Upload to: ")
-                    file = open(input("Full Address of File: "), 'rb')
-                    try:
-                        s3.Object(bucketName, os.path.basename(
-                            file.name)).put(Body=file)
-                        print("Successfully Uploaded File " +
-                              os.path.basename(file.name) + " to " + bucketName)
-                        file.close()
-                    except Exception as e:
+                if s3Sub == 2:
+                    filesub = menu.generate('Upload Files', 1, 1, *uploadMenu)
+                    if filesub == 1:
                         menu.clearScreen()
-                        print(e)
-                        print("An error has occured, please try again later...")
-                        if debug:
-                            input()
-                    time.sleep(2)
-                if s3sub == 3:
+                        print("Single File Upload")
+                        print("\nAvailable Buckets:")
+                        for bucket in s3.buckets.all():
+                            print(bucket.name)
+                            bucketName = input("\nBucket to Upload to: ")
+                            file = open(input("Full Address of File: "), 'rb')
+                            try:
+                                s3.Object(bucketName, os.path.basename(file.name)).put(Body=file)
+                                print("Successfully Uploaded File " + os.path.basename(file.name) + " to " + bucketName)
+                                file.close()
+                            except Exception as e:
+                                menu.clearScreen()
+                                print(e)
+                                print("An error has occured, please try again later...")
+                                if debug:
+                                    input()
+                                    time.sleep(2)
+                    if filesub == 2:
+                        menu.clearScreen()
+                        print("Multi-File Upload")
+                        print("\nAvailable Buckets:")
+                        for bucket in s3.buckets.all():
+                            print(bucket.name)
+                        bucketName = input("\nBucket to Upload to: ")
+                        print("To finish file selection press enter.")
+                        pendinguploads = []
+                        while True:
+                            file = input("Full Address of File: ")
+                            if file == "":
+                                break
+                            pendinguploads.append(file)
+                        #TODO: setup up multi threading for background upload
+                        for file in pendinguploads:
+                            try:
+                                openfile = open(file, 'rb')
+                                s3.Object(bucketName, os.path.basename(openfile.name)).put(Body=openfile)
+                            except Exception as e:
+                                print(e)
+                                input()
+                        print("Successfully Uploaded Files to " + bucketName)
+                        time.sleep(2)
+                if s3Sub == 3:
                     menu.clearScreen()
                     print("Download File")
                     print("\nAvailable Buckets and Files:")
@@ -142,8 +164,7 @@ while True:
                     bucketName = input("\nBucket to Download From: ")
                     file = input("Full Address of File: ")
                     try:
-                        s3.Bucket(bucketName).download_file(
-                            file, '/downloads/' + file)
+                        s3.Bucket(bucketName).download_file(file, '/downloads/' + file)
                         print("Successfully Downloaded File " + file)
                     except Exception as e:
                         menu.clearScreen()
@@ -152,7 +173,7 @@ while True:
                         if debug:
                             input()
                     time.sleep(2)
-                if s3sub == 4:
+                if s3Sub == 4:
                     menu.clearScreen()
                     print("Delete File")
                     print("\nAvailable Buckets and Files:")
@@ -215,8 +236,7 @@ while True:
                         bucket.delete()
                         print("Bucket " + bucketName + " has been deleted.")
                     else:
-                        print("Bucket " + bucketName +
-                              " has not been deleted.")
+                        print("Bucket " + bucketName + " has not been deleted.")
                     time.sleep(1)
                     input("Press Enter to continue...")
                 elif bucketmain == 4:
@@ -235,8 +255,7 @@ while True:
                         error_code = int(e.response['Error']['Code'])
                         if error_code == 404:
                             exists = False
-                            print(
-                                "The bucket you requested does not exist or you do not have access to it.")
+                            print("The bucket you requested does not exist or you do not have access to it.")
                     print(exists)
                     time.sleep(2)
         if submain1 == 2:
