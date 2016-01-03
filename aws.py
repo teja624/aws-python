@@ -1,61 +1,10 @@
 #!/usr/bin/env python3
-import sys
-import os
-import time
-import subprocess
-import menugenerator as menu
-# TODO: Turn follow mess into lib
-# Start up lib checks
+import sys, os, time, menugenerator as menu, boto3, botocore
 debug = 0
-boto3Status = 0
-awscliStatus = 0
-commands = 'pip3 install'
-packages = ['boto3', 'awscli']
-try:
-    import boto3
-    boto3Status = 1
-except ImportError:
-    boto3Status = 0
-
-try:
-    import awscli
-    awscliStatus = 1
-except ImportError:
-    awscliStatus = 0
-
-if boto3Status:
-    if debug:
-        print("found lib " + packages[0])
-else:
-    if os.name == 'nt':
-        print("windows interface")
-        os.system(commands + " " + packages[0])
-        # pip install --install-option="--prefix=$HOME/local" boto3
-        time.sleep(1)
-    else:
-        os.system("sudo" + commands + packages[0])
-
-if awscliStatus:
-    if debug:
-        print("found lib " + packages[1])
-else:
-    if os.name == 'nt':
-        print("windows interface")
-        os.system(commands + " " + packages[1])
-        # pip install --install-option="--prefix=$HOME/local" boto3
-        time.sleep(1)
-    else:
-        os.system("sudo" + commands + packages[1])
-if debug:
-    time.sleep(1)
-
-import boto3
-import botocore
-
 menu = menu.menu
 size = sys.stdout
 
-# menu declerations (it does support more than 3 listable items)
+# menu declerations
 mainMenu = ['AWS Functions', 'Setup', 'Exit']
 awsMenu = ['S3', 'Other', 'Exit']
 s3Menu = ['Modify or View Files', 'Modify or View Buckets']
@@ -116,19 +65,19 @@ while True:
                         print("\nAvailable Buckets:")
                         for bucket in s3.buckets.all():
                             print(bucket.name)
-                            bucketName = input("\nBucket to Upload to: ")
-                            file = open(input("Full Address of File: "), 'rb')
-                            try:
-                                s3.Object(bucketName, os.path.basename(file.name)).put(Body=file)
-                                print("Successfully Uploaded File " + os.path.basename(file.name) + " to " + bucketName)
-                                file.close()
-                            except Exception as e:
-                                menu.clearScreen()
-                                print(e)
-                                print("An error has occured, please try again later...")
-                                if debug:
-                                    input()
-                                    time.sleep(2)
+                        bucketName = input("\nBucket to Upload to: ")
+                        file = open(input("Full Address of File: "), 'rb')
+                        try:
+                            s3.Object(bucketName, os.path.basename(file.name)).put(Body=file)
+                            print("Successfully Uploaded File " + os.path.basename(file.name) + " to " + bucketName)
+                            file.close()
+                        except Exception as e:
+                            menu.clearScreen()
+                            print(e)
+                            print("An error has occured, please try again later...")
+                            if debug:
+                                input()
+                                time.sleep(2)
                     if filesub == 2:
                         menu.clearScreen()
                         print("Multi-File Upload")
