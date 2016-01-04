@@ -1,51 +1,48 @@
 #!/usr/bin/env python3
 import sys, os, time, menugenerator as menu, boto3, botocore
-debug = 0
+debug = 1
 menu = menu.menu
 size = sys.stdout
 
 # menu declerations
 mainMenu = ['AWS Functions', 'Setup', 'Exit']
-awsMenu = ['S3', 'Other', 'Exit']
+awsMenu = ['S3','Exit']
 s3Menu = ['Modify or View Files', 'Modify or View Buckets']
 bucketsMenu = ['List All Buckets', 'Initialise a New Bucket','Delete Bucket', 'Check the Status of a Bucket']
 s3sub = ['View Files', 'Upload Files', 'Download File', 'Delete File']
 uploadMenu = ['Single File Upload', 'Multi-File Upload']
 
+
+s3 = boto3.resource('s3')
+
 # intro "animation" and ASCII art
 def asciiArt():
-    print("Welcome to...")
-    time.sleep(1)
-    menu.blankSpace(1)
-    print("      __          _______   _____       _   _                 ")
+    print("\n      __          _______   _____       _   _                 ")
     print("     /\ \        / / ____| |  __ \     | | | |                ")
     print("    /  \ \  /\  / / (___   | |__) |   _| |_| |__   ___  _ __  ")
     print("   / /\ \ \/  \/ / \___ \  |  ___/ | | | __| '_ \ / _ \| '_ \ ")
     print("  / ____ \  /\  /  ____) | | |   | |_| | |_| | | | (_) | | | |")
     print(" /_/    \_\/  \/  |_____/  |_|    \__, |\__|_| |_|\___/|_| |_|")
-    print("                                   __/ |                      ")
-    print("                                  |___/                   V0.2")
-    menu.blankSpace(1)
-    print("Written by Tom Hulbert")
+    print(" (S3 Functionality Only)           __/ |                      ")
+    print("Written by Tom Hulbert            |___/                   V0.2")
 
 # Thanks to Active State user Barry Walker for assistance with window sizing
 size.write("\x1b[8;{rows};{cols}t".format(rows=28, cols=150))
 
 menu.clearScreen()
 asciiArt()
-time.sleep(3)
+if not debug:
+    time.sleep(3)
 while True:
     menu.clearScreen()
     print("For first time users select 'Setup'")
     if debug:
         print("Debug is enabled")
-    menu.blankSpace(1)
-    main = menu.generate('Main Menu', 0, 0, *mainMenu)
+    main = menu.generate('\nMain Menu', 0, 0, *mainMenu)
     if main == 1:  # AWS Functions
         submain1 = menu.generate('AWS Functions', 1, 1, *awsMenu)
         if submain1 == 1:  # S3 Functions
             menu.clearScreen()
-            s3 = boto3.resource('s3')
             s3main = menu.generate('S3 Functions', 1, 1, *s3Menu)
             if s3main == 1:
                 s3Sub = menu.generate('Upload or Download Files', 1, 1, *s3sub)
@@ -158,9 +155,8 @@ while True:
                     print("Initialise a New Bucket")
                     print("\nPlease Note:\nThe name that you choose must be unique across all existing bucket names in Amazon S3.\nOne way to help ensure uniqueness is to prefix your bucket names with the name of your organization.\n")
                     bucketName = input("Enter Name For New Bucket: ")
-                    menu.blankSpace(1)
                     try:
-                        print("Initialising New Bucket as " + bucketName + "...")
+                        print("\nInitialising New Bucket as " + bucketName + "...")
                         s3.create_bucket(Bucket=bucketName)
                         print("New Bucket " + bucketName + " Initialised")
                     except Exception as e:
@@ -204,17 +200,11 @@ while True:
                         error_code = int(e.response['Error']['Code'])
                         if error_code == 404:
                             exists = False
-                            print("The bucket you requested does not exist or you do not have access to it.")
+                            print("The bucket you requested does not exist or you do not have the correct permissions")
                     print(exists)
                     time.sleep(2)
-        if submain1 == 2:
-            menu.clearScreen()
-            print(awsMenu[1])
-            time.sleep(1)
-        if submain1 == 3:
-            menu.clearScreen()
-            print(awsMenu[2])
-            time.sleep(1)
+        if submain1 == 1:
+            exit()
     elif main == 2:
         os.system('aws configure')
         time.sleep(2)
@@ -225,5 +215,5 @@ while True:
         break
     else:
         menu.clearScreen()
-        print("Please enter a valid option")
+        print("Please Select a valid option")
         time.sleep(2)
