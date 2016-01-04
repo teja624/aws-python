@@ -1,7 +1,7 @@
 # aws-python
 ## A python "browser" for AWS (S3) services
 
-**This project is no longer under development due to AWS free tier limitations**
+**This project is no longer under active development due to AWS free tier limitations**
 
 ### --INSTALLATION--
 * Run 'python setup.py install'
